@@ -17,6 +17,10 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Temporary project files
+results.txt
+*.bak
+
 # =========================
 # Operating System Files
 # =========================

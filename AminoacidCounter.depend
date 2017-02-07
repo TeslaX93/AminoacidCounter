@@ -5,9 +5,10 @@
 	<cstdlib>
 	<string>
 
-1486487974 source:c:\users\teslax\documents\github\aminoacidcounter\main.cpp
+1486509403 source:c:\users\teslax\documents\github\aminoacidcounter\main.cpp
 	<iostream>
 	<fstream>
 	<cstdlib>
 	<string>
+	<algorithm>
 
