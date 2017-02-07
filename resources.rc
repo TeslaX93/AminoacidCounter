@@ -1,0 +1,28 @@
+#define VOS_NT_WINDOWS32    0x00040004L
+#define VFT_APP                       0x00000001L
+
+1 VERSIONINFO
+FILEVERSION 0,0,1,2
+PRODUCTVERSION 0,0,1,2
+FILETYPE VFT_APP
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904E4"
+		{
+			VALUE "CompanyName", "TeslaX93"
+			VALUE "FileVersion", "0.1.2"
+			VALUE "FileDescription", "Aminoacid Counter by TeslaX93 [Bartłomiej Malarz]"
+			VALUE "InternalName", "ProteinCounter"
+			VALUE "LegalCopyright", ""
+			VALUE "LegalTrademarks", ""
+			VALUE "OriginalFilename", "ProteinCounter.exe"
+			VALUE "ProductName", "AminoacidCounter"
+			VALUE "ProductVersion", "0.1.2"
+		}
+	}
+	BLOCK "VarFileInfo"
+		{
+			VALUE "Translation", 0x0409, 1252
+		}
+}
