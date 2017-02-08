@@ -2,7 +2,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <string>
-#include <algorithm>
+
+
 using namespace std;
 
 int showWhereIs(string co, string gdzie) {
@@ -15,35 +16,44 @@ int showWhereIs(string co, string gdzie) {
 else return 0;
 }
 
+string incString(string incval)
+{
+int in = atoi(incval.c_str());
+in++;
+string tmp;
+itoa(in,(char*)tmp.c_str(),10);
+string incIn = tmp.c_str();
 
-
+return incIn;
+}
 string linia;
 string temp = "ZZZ";
 string sequence = "";
 bool pdbfile = false;
 int line_counter = 1;
 int pos,atype = 0;
-int n=0; //for testing in future versions
+//int n=0; //for testing in future versions
 int amino[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int main(int argc, char* argv[])
 {
-    cout<<"\nAminoacidCounter 0.2.0, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
-    if(argc!=2) {cout<<"Error: Invalid number of arguments. \n"<<endl;
-    cout<<"Usage: aacounter.exe [path] \n (or simply drag and drop *.mol2 file on program icon) \n"<<endl;
-
-    exit(0);
+cout<<"\nAminoacidCounter 0.2.1, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
+    if(argc!=2)
+    { cout<<"Error: Invalid number of arguments. \n"<<endl;
+      cout<<"Usage: AminoacidCounter.exe [path] \n (or simply drag and drop *.mol2 or *.pdb file on program icon) \n"<<endl;
+      exit(0);
     }
-    fstream inputfile,outputfile;
-    inputfile.open(argv[argc-1],ios::in);
-    outputfile.open("results.txt",ios::out | ios::app);
-    if(inputfile.good()==false)
+fstream inputfile,outputfile;
+inputfile.open(argv[argc-1],ios::in);
+outputfile.open("results.txt",ios::out | ios::app);
+if(inputfile.good()==false)
     {
        cout<<"File not found"<<endl;
+       outputfile.close();
        exit(0);
     }
-    outputfile<<argv[argc-1]<<endl<<endl;
-    line_counter = line_counter + n; //for future use
+outputfile<<argv[argc-1]<<endl<<endl;
+//line_counter = line_counter + n; //for future use
 
 string filename = argv[argc-1];
 cout<<filename<<endl;
@@ -53,12 +63,11 @@ if(pdbfile==false) {
     {
         switch(line_counter) {
         case 1: if(showWhereIs(" Mol2",linia)==1) {outputfile<<"Mol2 file type detected."<<endl;}
-                else if(showWhereIs("EADER",linia)==1) {pdbfile = true; outputfile<<"Type mismatch. Wrong extension. Please contact author."<<endl; }
-                else { outputfile<<"Error: Not a valid MOL2/PDB file"<<endl; outputfile.close(); exit(0); }
-
+                else if(showWhereIs("EADER",linia)==1) {pdbfile = true; outputfile<<"Error: Type mismatch. Wrong extension. Please contact author."<<endl; }
+                else { outputfile<<"Error: Not a valid MOL2/PDB file"<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0); }
                 break;
-        case 2: if((pdbfile) && ((showWhereIs("ITLE",linia))!=1)) {outputfile<<"Error: Unknown format."<<endl; outputfile.close(); exit(0);} break;
-        case 3: if((!pdbfile)&&(linia!="@<TRIPOS>MOLECULE")) {outputfile<<"Error: Unknown format."<<endl; outputfile.close(); exit(0);}break;
+        case 2: if((pdbfile) && ((showWhereIs("ITLE",linia))!=1)) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear();  exit(0);} break;
+        case 3: if((!pdbfile)&&(linia!="@<TRIPOS>MOLECULE")) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0);}break;
         case 4:
         case 5:
         case 6:
@@ -67,9 +76,7 @@ if(pdbfile==false) {
         case 9:
         case 10: break;
         default:
-
             {
-
             if(showWhereIs("ALA",linia)!=0) {pos=showWhereIs("ALA",linia); atype=1;}
             if(showWhereIs("CYS",linia)!=0) {pos=showWhereIs("CYS",linia); atype=2;}
             if(showWhereIs("ASP",linia)!=0) {pos=showWhereIs("ASP",linia); atype=3;}
@@ -90,10 +97,9 @@ if(pdbfile==false) {
             if(showWhereIs("VAL",linia)!=0) {pos=showWhereIs("VAL",linia); atype=18;}
             if(showWhereIs("TRP",linia)!=0) {pos=showWhereIs("TRP",linia); atype=19;}
             if(showWhereIs("TYR",linia)!=0) {pos=showWhereIs("TYR",linia); atype=20;}
-            //if(showWhereIs("@<TRIPOS>BOND",  linia)!=0)
+
             if((linia!="@<TRIPOS>BOND")&&(temp!=linia.substr(pos,6)))
                     {
-                        //cout<<temp<<"="<<linia.substr((size_t) pos,(size_t) 6)<<endl;
                     temp=linia.substr(pos,6);
                     switch(atype)
                         {
@@ -122,21 +128,14 @@ if(pdbfile==false) {
                     }
             break;
             }
-
-
         }
         line_counter++;
         if(linia=="@<TRIPOS>BOND" || linia=="@<TRIPOS>SUBSTRUCTURE") break;
     }
-
 }
-
 if(pdbfile==true) {
     while(getline(inputfile,linia)) {
-        //if((showWhereIs("EXRES",linia)==1)&&((showWhereIs("B",linia))!=0)) break;
         if((showWhereIs("TOM",linia)==1)&&(showWhereIs("B",linia)==0)) {
-
-
             if((showWhereIs(" ALA",linia)!=0)) {pos=showWhereIs(" ALA",linia); atype=1;}
             if((showWhereIs(" CYS",linia)!=0)) {pos=showWhereIs(" CYS",linia); atype=2;}
             if((showWhereIs(" ASP",linia)!=0)) {pos=showWhereIs(" ASP",linia); atype=3;}
@@ -157,12 +156,11 @@ if(pdbfile==true) {
             if((showWhereIs(" VAL",linia)!=0)) {pos=showWhereIs(" VAL",linia); atype=18;}
             if((showWhereIs(" TRP",linia)!=0)) {pos=showWhereIs(" TRP",linia); atype=19;}
             if((showWhereIs(" TYR",linia)!=0)) {pos=showWhereIs(" TYR",linia); atype=20;}
-            //if(showWhereIs("@<TRIPOS>BOND",  linia)!=0)
+
             if(temp!=linia.substr(pos,7))
                     {
                         cout<<temp<<"="<<linia.substr((size_t) pos,(size_t) 7)<<endl;
-                    temp=linia.substr(pos,7);
-                    //cout<<temp<<endl;
+                        temp=linia.substr(pos,7);
                     switch(atype)
                         {
                         case 1: amino[0]++; amino[20]++; sequence+="A"; break;
@@ -185,14 +183,13 @@ if(pdbfile==true) {
                         case 18: amino[17]++; amino[20]++; sequence+="V";  break;
                         case 19: amino[18]++; amino[20]++; sequence+="W";  break;
                         case 20: amino[19]++; amino[20]++; sequence+="Y";  break;
-                        default: /*outputfile<<"Error during file processing. Unknown line no. "<<line_counter<<endl; */ break;
+                        default:  break;
                         }
                     }
         }
         line_counter++;
     }
 }
-
     outputfile<<endl;
     outputfile<<"ALA"<<"               "<<amino[0]<<endl;
     outputfile<<"CYS"<<"               "<<amino[1]<<endl;
@@ -224,18 +221,18 @@ if(pdbfile==true) {
     outputfile.clear();
     inputfile.close();
     inputfile.clear();
-
-
     cout << "Operation done. Check for errors in your result file." << endl;
     if(pdbfile) cout << "PDB support is currently in EXPERIMENTAL stage. May contain errors."<<endl;
     return 0;
 }
 
 
+
+
 /*
 MIT License
 
-Copyright (c) 2017 Bart³omiej Malarz [TeslaX93]
+Copyright (c) 2017 BartÅ‚omiej Malarz [TeslaX93]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -255,3 +252,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
