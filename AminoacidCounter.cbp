@@ -35,6 +35,7 @@
 		</Compiler>
 		<Unit filename=".gitattributes" />
 		<Unit filename=".gitignore" />
+		<Unit filename="LICENSE" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

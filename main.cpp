@@ -26,9 +26,10 @@ string incIn = tmp.c_str();
 
 return incIn;
 }
-string linia;
+string currLine;
 string temp = "ZZZ";
 string sequence = "";
+string seqlong = "";
 bool pdbfile = false;
 int line_counter = 1;
 int pos,atype = 0;
@@ -37,14 +38,16 @@ int amino[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int main(int argc, char* argv[])
 {
-cout<<"\nAminoacidCounter 0.2.1, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
+cout<<"\nAminoacidCounter 0.2.3, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
+cout<<"With dedication for Paulina W. <3"<<endl;
     if(argc!=2)
     { cout<<"Error: Invalid number of arguments. \n"<<endl;
       cout<<"Usage: AminoacidCounter.exe [path] \n (or simply drag and drop *.mol2 or *.pdb file on program icon) \n"<<endl;
+      // -forcepdb -forcemol2 -long
       exit(0);
     }
 fstream inputfile,outputfile;
-inputfile.open(argv[argc-1],ios::in);
+inputfile.open(argv[1],ios::in);
 outputfile.open("results.txt",ios::out | ios::app);
 if(inputfile.good()==false)
     {
@@ -56,18 +59,18 @@ outputfile<<argv[argc-1]<<endl<<endl;
 //line_counter = line_counter + n; //for future use
 
 string filename = argv[argc-1];
-cout<<filename<<endl;
+cout<<"Input file: "<<filename<<endl;
 if(showWhereIs(".pdb",filename)!=0) pdbfile=true;
 if(pdbfile==false) {
-    while(getline(inputfile,linia))
+    while(getline(inputfile,currLine))
     {
         switch(line_counter) {
-        case 1: if(showWhereIs(" Mol2",linia)==1) {outputfile<<"Mol2 file type detected."<<endl;}
-                else if(showWhereIs("EADER",linia)==1) {pdbfile = true; outputfile<<"Error: Type mismatch. Wrong extension. Please contact author."<<endl; }
-                else { outputfile<<"Error: Not a valid MOL2/PDB file"<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0); }
+        case 1: if(showWhereIs(" Mol2",currLine)==1) {outputfile<<"Mol2 file type detected."<<endl;}
+                else if(showWhereIs("EADER",currLine)==1) {pdbfile = true; outputfile<<"Error: Type mismatch. Wrong extension. Please contact author."<<endl; }
+                else { outputfile<<"Error: Not a valid MOL2/PDB file. Wrong headers or file corrupted."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0); }
                 break;
-        case 2: if((pdbfile) && ((showWhereIs("ITLE",linia))!=1)) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear();  exit(0);} break;
-        case 3: if((!pdbfile)&&(linia!="@<TRIPOS>MOLECULE")) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0);}break;
+        case 2: if((pdbfile) && ((showWhereIs("ITLE",currLine))!=1)) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear();  exit(0);} break;
+        case 3: if((!pdbfile)&&(currLine!="@<TRIPOS>MOLECULE")) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0);}break;
         case 4:
         case 5:
         case 6:
@@ -77,52 +80,52 @@ if(pdbfile==false) {
         case 10: break;
         default:
             {
-            if(showWhereIs("ALA",linia)!=0) {pos=showWhereIs("ALA",linia); atype=1;}
-            if(showWhereIs("CYS",linia)!=0) {pos=showWhereIs("CYS",linia); atype=2;}
-            if(showWhereIs("ASP",linia)!=0) {pos=showWhereIs("ASP",linia); atype=3;}
-            if(showWhereIs("GLU",linia)!=0) {pos=showWhereIs("GLU",linia); atype=4;}
-            if(showWhereIs("PHE",linia)!=0) {pos=showWhereIs("PHE",linia); atype=5;}
-            if(showWhereIs("GLY",linia)!=0) {pos=showWhereIs("GLY",linia); atype=6;}
-            if(showWhereIs("HIS",linia)!=0) {pos=showWhereIs("HIS",linia); atype=7;}
-            if(showWhereIs("ILE",linia)!=0) {pos=showWhereIs("ILE",linia); atype=8;}
-            if(showWhereIs("LYS",linia)!=0) {pos=showWhereIs("LYS",linia); atype=9;}
-            if(showWhereIs("LEU",linia)!=0) {pos=showWhereIs("LEU",linia); atype=10;}
-            if(showWhereIs("MET",linia)!=0) {pos=showWhereIs("MET",linia); atype=11;}
-            if(showWhereIs("ASN",linia)!=0) {pos=showWhereIs("ASN",linia); atype=12;}
-            if(showWhereIs("PRO",linia)!=0) {pos=showWhereIs("PRO",linia); atype=13;}
-            if(showWhereIs("GLN",linia)!=0) {pos=showWhereIs("GLN",linia); atype=14;}
-            if(showWhereIs("ARG",linia)!=0) {pos=showWhereIs("ARG",linia); atype=15;}
-            if(showWhereIs("SER",linia)!=0) {pos=showWhereIs("SER",linia); atype=16;}
-            if(showWhereIs("THR",linia)!=0) {pos=showWhereIs("THR",linia); atype=17;}
-            if(showWhereIs("VAL",linia)!=0) {pos=showWhereIs("VAL",linia); atype=18;}
-            if(showWhereIs("TRP",linia)!=0) {pos=showWhereIs("TRP",linia); atype=19;}
-            if(showWhereIs("TYR",linia)!=0) {pos=showWhereIs("TYR",linia); atype=20;}
+            if(showWhereIs("ALA",currLine)!=0) {pos=showWhereIs("ALA",currLine); atype=1;}
+            if(showWhereIs("CYS",currLine)!=0) {pos=showWhereIs("CYS",currLine); atype=2;}
+            if(showWhereIs("ASP",currLine)!=0) {pos=showWhereIs("ASP",currLine); atype=3;}
+            if(showWhereIs("GLU",currLine)!=0) {pos=showWhereIs("GLU",currLine); atype=4;}
+            if(showWhereIs("PHE",currLine)!=0) {pos=showWhereIs("PHE",currLine); atype=5;}
+            if(showWhereIs("GLY",currLine)!=0) {pos=showWhereIs("GLY",currLine); atype=6;}
+            if(showWhereIs("HIS",currLine)!=0) {pos=showWhereIs("HIS",currLine); atype=7;}
+            if(showWhereIs("ILE",currLine)!=0) {pos=showWhereIs("ILE",currLine); atype=8;}
+            if(showWhereIs("LYS",currLine)!=0) {pos=showWhereIs("LYS",currLine); atype=9;}
+            if(showWhereIs("LEU",currLine)!=0) {pos=showWhereIs("LEU",currLine); atype=10;}
+            if(showWhereIs("MET",currLine)!=0) {pos=showWhereIs("MET",currLine); atype=11;}
+            if(showWhereIs("ASN",currLine)!=0) {pos=showWhereIs("ASN",currLine); atype=12;}
+            if(showWhereIs("PRO",currLine)!=0) {pos=showWhereIs("PRO",currLine); atype=13;}
+            if(showWhereIs("GLN",currLine)!=0) {pos=showWhereIs("GLN",currLine); atype=14;}
+            if(showWhereIs("ARG",currLine)!=0) {pos=showWhereIs("ARG",currLine); atype=15;}
+            if(showWhereIs("SER",currLine)!=0) {pos=showWhereIs("SER",currLine); atype=16;}
+            if(showWhereIs("THR",currLine)!=0) {pos=showWhereIs("THR",currLine); atype=17;}
+            if(showWhereIs("VAL",currLine)!=0) {pos=showWhereIs("VAL",currLine); atype=18;}
+            if(showWhereIs("TRP",currLine)!=0) {pos=showWhereIs("TRP",currLine); atype=19;}
+            if(showWhereIs("TYR",currLine)!=0) {pos=showWhereIs("TYR",currLine); atype=20;}
 
-            if((linia!="@<TRIPOS>BOND")&&(temp!=linia.substr(pos,6)))
+            if((currLine!="@<TRIPOS>BOND")&&(temp!=currLine.substr(pos,6)))
                     {
-                    temp=linia.substr(pos,6);
+                    temp=currLine.substr(pos,6);
                     switch(atype)
                         {
-                        case 1: amino[0]++; amino[20]++; sequence+="A"; break;
-                        case 2: amino[1]++; amino[20]++; sequence+="C";  break;
-                        case 3: amino[2]++; amino[20]++; sequence+="D";  break;
-                        case 4: amino[3]++; amino[20]++; sequence+="E";  break;
-                        case 5: amino[4]++; amino[20]++; sequence+="F";  break;
-                        case 6: amino[5]++; amino[20]++; sequence+="G";  break;
-                        case 7: amino[6]++; amino[20]++; sequence+="H";  break;
-                        case 8: amino[7]++; amino[20]++; sequence+="I";  break;
-                        case 9: amino[8]++; amino[20]++; sequence+="K";  break;
-                        case 10: amino[9]++; amino[20]++; sequence+="L";  break;
-                        case 11: amino[10]++; amino[20]++; sequence+="M";  break;
-                        case 12: amino[11]++; amino[20]++; sequence+="N";  break;
-                        case 13: amino[12]++; amino[20]++; sequence+="P";  break;
-                        case 14: amino[13]++; amino[20]++; sequence+="Q";  break;
-                        case 15: amino[14]++; amino[20]++; sequence+="R";  break;
-                        case 16: amino[15]++; amino[20]++; sequence+="S";  break;
-                        case 17: amino[16]++; amino[20]++; sequence+="T";  break;
-                        case 18: amino[17]++; amino[20]++; sequence+="V";  break;
-                        case 19: amino[18]++; amino[20]++; sequence+="W";  break;
-                        case 20: amino[19]++; amino[20]++; sequence+="Y";  break;
+                        case 1:  amino[0]++;  amino[20]++; sequence+="A"; seqlong+="Ala"; break;
+                        case 2:  amino[1]++;  amino[20]++; sequence+="C"; seqlong+="Cys"; break;
+                        case 3:  amino[2]++;  amino[20]++; sequence+="D"; seqlong+="Asp"; break;
+                        case 4:  amino[3]++;  amino[20]++; sequence+="E"; seqlong+="Glu"; break;
+                        case 5:  amino[4]++;  amino[20]++; sequence+="F"; seqlong+="Phe"; break;
+                        case 6:  amino[5]++;  amino[20]++; sequence+="G"; seqlong+="Gly"; break;
+                        case 7:  amino[6]++;  amino[20]++; sequence+="H"; seqlong+="His"; break;
+                        case 8:  amino[7]++;  amino[20]++; sequence+="I"; seqlong+="Ile"; break;
+                        case 9:  amino[8]++;  amino[20]++; sequence+="K"; seqlong+="Lys"; break;
+                        case 10: amino[9]++;  amino[20]++; sequence+="L"; seqlong+="Leu"; break;
+                        case 11: amino[10]++; amino[20]++; sequence+="M"; seqlong+="Met"; break;
+                        case 12: amino[11]++; amino[20]++; sequence+="N"; seqlong+="Asn"; break;
+                        case 13: amino[12]++; amino[20]++; sequence+="P"; seqlong+="Pro"; break;
+                        case 14: amino[13]++; amino[20]++; sequence+="Q"; seqlong+="Gln"; break;
+                        case 15: amino[14]++; amino[20]++; sequence+="R"; seqlong+="Arg"; break;
+                        case 16: amino[15]++; amino[20]++; sequence+="S"; seqlong+="Ser"; break;
+                        case 17: amino[16]++; amino[20]++; sequence+="T"; seqlong+="Thr"; break;
+                        case 18: amino[17]++; amino[20]++; sequence+="V"; seqlong+="Val"; break;
+                        case 19: amino[18]++; amino[20]++; sequence+="W"; seqlong+="Trp"; break;
+                        case 20: amino[19]++; amino[20]++; sequence+="Y"; seqlong+="Tyr"; break;
                         default: break;
                         }
                     }
@@ -130,59 +133,59 @@ if(pdbfile==false) {
             }
         }
         line_counter++;
-        if(linia=="@<TRIPOS>BOND" || linia=="@<TRIPOS>SUBSTRUCTURE") break;
+        if(currLine=="@<TRIPOS>BOND" || currLine=="@<TRIPOS>SUBSTRUCTURE") break;
     }
 }
 if(pdbfile==true) {
-    while(getline(inputfile,linia)) {
-        if((showWhereIs("TOM",linia)==1)&&(showWhereIs("B",linia)==0)) {
-            if((showWhereIs(" ALA",linia)!=0)) {pos=showWhereIs(" ALA",linia); atype=1;}
-            if((showWhereIs(" CYS",linia)!=0)) {pos=showWhereIs(" CYS",linia); atype=2;}
-            if((showWhereIs(" ASP",linia)!=0)) {pos=showWhereIs(" ASP",linia); atype=3;}
-            if((showWhereIs(" GLU",linia)!=0)) {pos=showWhereIs(" GLU",linia); atype=4;}
-            if((showWhereIs(" PHE",linia)!=0)) {pos=showWhereIs(" PHE",linia); atype=5;}
-            if((showWhereIs(" GLY",linia)!=0)) {pos=showWhereIs(" GLY",linia); atype=6;}
-            if((showWhereIs(" HIS",linia)!=0)) {pos=showWhereIs(" HIS",linia); atype=7;}
-            if((showWhereIs(" ILE",linia)!=0)) {pos=showWhereIs(" ILE",linia); atype=8;}
-            if((showWhereIs(" LYS",linia)!=0)) {pos=showWhereIs(" LYS",linia); atype=9;}
-            if((showWhereIs(" LEU",linia)!=0)) {pos=showWhereIs(" LEU",linia); atype=10;}
-            if((showWhereIs(" MET",linia)!=0)) {pos=showWhereIs(" MET",linia); atype=11;}
-            if((showWhereIs(" ASN",linia)!=0)) {pos=showWhereIs(" ASN",linia); atype=12;}
-            if((showWhereIs(" PRO",linia)!=0)) {pos=showWhereIs(" PRO",linia); atype=13;}
-            if((showWhereIs(" GLN",linia)!=0)) {pos=showWhereIs(" GLN",linia); atype=14;}
-            if((showWhereIs(" ARG",linia)!=0)) {pos=showWhereIs(" ARG",linia); atype=15;}
-            if((showWhereIs(" SER",linia)!=0)) {pos=showWhereIs(" SER",linia); atype=16;}
-            if((showWhereIs(" THR",linia)!=0)) {pos=showWhereIs(" THR",linia); atype=17;}
-            if((showWhereIs(" VAL",linia)!=0)) {pos=showWhereIs(" VAL",linia); atype=18;}
-            if((showWhereIs(" TRP",linia)!=0)) {pos=showWhereIs(" TRP",linia); atype=19;}
-            if((showWhereIs(" TYR",linia)!=0)) {pos=showWhereIs(" TYR",linia); atype=20;}
+    while(getline(inputfile,currLine)) {
+        if((showWhereIs("TOM",currLine)==1)&&(showWhereIs("B",currLine)==0)) {
+            if((showWhereIs(" ALA",currLine)!=0)) {pos=showWhereIs(" ALA",currLine); atype=1;}
+            if((showWhereIs(" CYS",currLine)!=0)) {pos=showWhereIs(" CYS",currLine); atype=2;}
+            if((showWhereIs(" ASP",currLine)!=0)) {pos=showWhereIs(" ASP",currLine); atype=3;}
+            if((showWhereIs(" GLU",currLine)!=0)) {pos=showWhereIs(" GLU",currLine); atype=4;}
+            if((showWhereIs(" PHE",currLine)!=0)) {pos=showWhereIs(" PHE",currLine); atype=5;}
+            if((showWhereIs(" GLY",currLine)!=0)) {pos=showWhereIs(" GLY",currLine); atype=6;}
+            if((showWhereIs(" HIS",currLine)!=0)) {pos=showWhereIs(" HIS",currLine); atype=7;}
+            if((showWhereIs(" ILE",currLine)!=0)) {pos=showWhereIs(" ILE",currLine); atype=8;}
+            if((showWhereIs(" LYS",currLine)!=0)) {pos=showWhereIs(" LYS",currLine); atype=9;}
+            if((showWhereIs(" LEU",currLine)!=0)) {pos=showWhereIs(" LEU",currLine); atype=10;}
+            if((showWhereIs(" MET",currLine)!=0)) {pos=showWhereIs(" MET",currLine); atype=11;}
+            if((showWhereIs(" ASN",currLine)!=0)) {pos=showWhereIs(" ASN",currLine); atype=12;}
+            if((showWhereIs(" PRO",currLine)!=0)) {pos=showWhereIs(" PRO",currLine); atype=13;}
+            if((showWhereIs(" GLN",currLine)!=0)) {pos=showWhereIs(" GLN",currLine); atype=14;}
+            if((showWhereIs(" ARG",currLine)!=0)) {pos=showWhereIs(" ARG",currLine); atype=15;}
+            if((showWhereIs(" SER",currLine)!=0)) {pos=showWhereIs(" SER",currLine); atype=16;}
+            if((showWhereIs(" THR",currLine)!=0)) {pos=showWhereIs(" THR",currLine); atype=17;}
+            if((showWhereIs(" VAL",currLine)!=0)) {pos=showWhereIs(" VAL",currLine); atype=18;}
+            if((showWhereIs(" TRP",currLine)!=0)) {pos=showWhereIs(" TRP",currLine); atype=19;}
+            if((showWhereIs(" TYR",currLine)!=0)) {pos=showWhereIs(" TYR",currLine); atype=20;}
 
-            if(temp!=linia.substr(pos,7))
+            if(temp!=currLine.substr(pos,7))
                     {
-                        cout<<temp<<"="<<linia.substr((size_t) pos,(size_t) 7)<<endl;
-                        temp=linia.substr(pos,7);
+                        //cout<<temp<<"="<<currLine.substr((size_t) pos,(size_t) 7)<<endl;
+                        temp=currLine.substr(pos,7);
                     switch(atype)
                         {
-                        case 1: amino[0]++; amino[20]++; sequence+="A"; break;
-                        case 2: amino[1]++; amino[20]++; sequence+="C";  break;
-                        case 3: amino[2]++; amino[20]++; sequence+="D";  break;
-                        case 4: amino[3]++; amino[20]++; sequence+="E";  break;
-                        case 5: amino[4]++; amino[20]++; sequence+="F";  break;
-                        case 6: amino[5]++; amino[20]++; sequence+="G";  break;
-                        case 7: amino[6]++; amino[20]++; sequence+="H";  break;
-                        case 8: amino[7]++; amino[20]++; sequence+="I";  break;
-                        case 9: amino[8]++; amino[20]++; sequence+="K";  break;
-                        case 10: amino[9]++; amino[20]++; sequence+="L";  break;
-                        case 11: amino[10]++; amino[20]++; sequence+="M";  break;
-                        case 12: amino[11]++; amino[20]++; sequence+="N";  break;
-                        case 13: amino[12]++; amino[20]++; sequence+="P";  break;
-                        case 14: amino[13]++; amino[20]++; sequence+="Q";  break;
-                        case 15: amino[14]++; amino[20]++; sequence+="R";  break;
-                        case 16: amino[15]++; amino[20]++; sequence+="S";  break;
-                        case 17: amino[16]++; amino[20]++; sequence+="T";  break;
-                        case 18: amino[17]++; amino[20]++; sequence+="V";  break;
-                        case 19: amino[18]++; amino[20]++; sequence+="W";  break;
-                        case 20: amino[19]++; amino[20]++; sequence+="Y";  break;
+                        case 1:  amino[0]++;  amino[20]++; sequence+="A"; seqlong+="Ala"; break;
+                        case 2:  amino[1]++;  amino[20]++; sequence+="C"; seqlong+="Cys"; break;
+                        case 3:  amino[2]++;  amino[20]++; sequence+="D"; seqlong+="Asp"; break;
+                        case 4:  amino[3]++;  amino[20]++; sequence+="E"; seqlong+="Glu"; break;
+                        case 5:  amino[4]++;  amino[20]++; sequence+="F"; seqlong+="Phe"; break;
+                        case 6:  amino[5]++;  amino[20]++; sequence+="G"; seqlong+="Gly"; break;
+                        case 7:  amino[6]++;  amino[20]++; sequence+="H"; seqlong+="His"; break;
+                        case 8:  amino[7]++;  amino[20]++; sequence+="I"; seqlong+="Ile"; break;
+                        case 9:  amino[8]++;  amino[20]++; sequence+="K"; seqlong+="Lys"; break;
+                        case 10: amino[9]++;  amino[20]++; sequence+="L"; seqlong+="Leu"; break;
+                        case 11: amino[10]++; amino[20]++; sequence+="M"; seqlong+="Met"; break;
+                        case 12: amino[11]++; amino[20]++; sequence+="N"; seqlong+="Asn"; break;
+                        case 13: amino[12]++; amino[20]++; sequence+="P"; seqlong+="Pro"; break;
+                        case 14: amino[13]++; amino[20]++; sequence+="Q"; seqlong+="Gln"; break;
+                        case 15: amino[14]++; amino[20]++; sequence+="R"; seqlong+="Arg"; break;
+                        case 16: amino[15]++; amino[20]++; sequence+="S"; seqlong+="Ser"; break;
+                        case 17: amino[16]++; amino[20]++; sequence+="T"; seqlong+="Thr"; break;
+                        case 18: amino[17]++; amino[20]++; sequence+="V"; seqlong+="Val"; break;
+                        case 19: amino[18]++; amino[20]++; sequence+="W"; seqlong+="Trp"; break;
+                        case 20: amino[19]++; amino[20]++; sequence+="Y"; seqlong+="Tyr"; break;
                         default:  break;
                         }
                     }
@@ -214,15 +217,17 @@ if(pdbfile==true) {
     outputfile<<"---"<<"               "<<endl;
     outputfile<<"TOTAL"<<"             "<<amino[20]<<endl;
     outputfile<<endl;
-    outputfile<<"SEQUENCE:"<<endl;
+    outputfile<<"SEQUENCE (short):"<<endl;
     outputfile<<sequence<<endl;
+    outputfile<<"SEQUENCE (abbrev.): "<<endl;
+    outputfile<<seqlong<<endl;
     outputfile<<endl;
     outputfile.close();
     outputfile.clear();
     inputfile.close();
     inputfile.clear();
     cout << "Operation done. Check for errors in your result file." << endl;
-    if(pdbfile) cout << "PDB support is currently in EXPERIMENTAL stage. May contain errors."<<endl;
+    if(pdbfile) cout << "PDB support is currently in BETA stage. May contain errors."<<endl;
     return 0;
 }
 
