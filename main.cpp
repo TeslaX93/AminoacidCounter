@@ -38,20 +38,23 @@ int amino[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int main(int argc, char* argv[])
 {
-cout<<"\nAminoacidCounter 0.2.3, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
-cout<<"With dedication for Paulina W. <3"<<endl;
-    if(argc!=2)
-    { cout<<"Error: Invalid number of arguments. \n"<<endl;
+cout<<"\nAminoacidCounter 0.3.0, author TeslaX93 [http://github.com/TeslaX93]"<<endl;
+cout<<"With dedication for Paulina W. "<<(char) 3<<endl;
+    if(argc>2)
+    {
+
+      cout<<"Error: Invalid number of arguments. \n"<<endl;
       cout<<"Usage: AminoacidCounter.exe [path] \n (or simply drag and drop *.mol2 or *.pdb file on program icon) \n"<<endl;
       // -forcepdb -forcemol2 -long
       exit(0);
     }
+    if(argc==1) cout<<"Kreator w przygotowaniu."<<endl;
 fstream inputfile,outputfile;
 inputfile.open(argv[1],ios::in);
 outputfile.open("results.txt",ios::out | ios::app);
 if(inputfile.good()==false)
     {
-       cout<<"File not found"<<endl;
+       cout<<"File not found or corrupted"<<endl;
        outputfile.close();
        exit(0);
     }
@@ -61,12 +64,12 @@ outputfile<<argv[argc-1]<<endl<<endl;
 string filename = argv[argc-1];
 cout<<"Input file: "<<filename<<endl;
 if(showWhereIs(".pdb",filename)!=0) pdbfile=true;
-if(pdbfile==false) {
+if(!pdbfile) {
     while(getline(inputfile,currLine))
     {
         switch(line_counter) {
         case 1: if(showWhereIs(" Mol2",currLine)==1) {outputfile<<"Mol2 file type detected."<<endl;}
-                else if(showWhereIs("EADER",currLine)==1) {pdbfile = true; outputfile<<"Error: Type mismatch. Wrong extension. Please contact author."<<endl; }
+                else if(showWhereIs("EADER",currLine)==1) {pdbfile = true; outputfile<<"Error: Filetype mismatch. Wrong extension. Please contact author."<<endl; }
                 else { outputfile<<"Error: Not a valid MOL2/PDB file. Wrong headers or file corrupted."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear(); exit(0); }
                 break;
         case 2: if((pdbfile) && ((showWhereIs("ITLE",currLine))!=1)) {outputfile<<"Error: Unknown format."<<endl; inputfile.close(); inputfile.clear(); outputfile.close(); outputfile.clear();  exit(0);} break;
@@ -136,8 +139,9 @@ if(pdbfile==false) {
         if(currLine=="@<TRIPOS>BOND" || currLine=="@<TRIPOS>SUBSTRUCTURE") break;
     }
 }
-if(pdbfile==true) {
-    while(getline(inputfile,currLine)) {
+if(pdbfile) {
+    while(getline(inputfile,currLine))
+    {
         if((showWhereIs("TOM",currLine)==1)&&(showWhereIs("B",currLine)==0)) {
             if((showWhereIs(" ALA",currLine)!=0)) {pos=showWhereIs(" ALA",currLine); atype=1;}
             if((showWhereIs(" CYS",currLine)!=0)) {pos=showWhereIs(" CYS",currLine); atype=2;}
@@ -162,9 +166,8 @@ if(pdbfile==true) {
 
             if(temp!=currLine.substr(pos,7))
                     {
-                        //cout<<temp<<"="<<currLine.substr((size_t) pos,(size_t) 7)<<endl;
                         temp=currLine.substr(pos,7);
-                    switch(atype)
+                        switch(atype)
                         {
                         case 1:  amino[0]++;  amino[20]++; sequence+="A"; seqlong+="Ala"; break;
                         case 2:  amino[1]++;  amino[20]++; sequence+="C"; seqlong+="Cys"; break;
@@ -227,7 +230,7 @@ if(pdbfile==true) {
     inputfile.close();
     inputfile.clear();
     cout << "Operation done. Check for errors in your result file." << endl;
-    if(pdbfile) cout << "PDB support is currently in BETA stage. May contain errors."<<endl;
+
     return 0;
 }
 
